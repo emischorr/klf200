@@ -8,13 +8,19 @@ defmodule Klf200 do
 
   """
   def connect(ip, pw) do
-    :connect
+    {:ok, _pid} = Klf200.Client.start_link()
+    :ok = Klf200.Client.connect(ip)
+    :ok = Klf200.Client.login(pw)
+    Klf200.Client.command(:GW_GET_ALL_NODES_INFORMATION_REQ)
   end
 
   def nodes() do
-    :nodes
+    Klf200.Client.nodes()
   end
 
-  def position(node, pos) do
+  def position(%{node: node}, pos) when is_integer(node) and is_integer(pos), do: position(node, pos)
+
+  def position(node, pos) when is_integer(node) and is_integer(pos) do
+    Klf200.Client.command(:GW_COMMAND_SEND_REQ, %{node: node, position: pos})
   end
 end

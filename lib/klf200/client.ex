@@ -34,6 +34,8 @@ defmodule Klf200.Client do
     GenServer.call(__MODULE__, {:login, password})
   end
 
+  def nodes, do: GenServer.call(__MODULE__, :nodes)
+
   def command(cmd), do: command(cmd, %{})
 
   def command(cmd, data) do
@@ -44,7 +46,7 @@ defmodule Klf200.Client do
 
   @impl GenServer
   def init(_opts) do
-    {:ok, %{socket: nil, logged_in: nil, waiting_client: nil, waiting_for_frame: nil, next_session: 0}}
+    {:ok, %{socket: nil, logged_in: nil, waiting_client: nil, waiting_for_frame: nil, next_session: 0, nodes: %{}}}
   end
 
   @impl GenServer
@@ -65,6 +67,11 @@ defmodule Klf200.Client do
     return = Socket.Stream.send(state.socket, Api.request(:GW_PASSWORD_ENTER_REQ, %{password: password}))
 
     {:reply, return, %{state | waiting_for_frame: :GW_PASSWORD_ENTER_CFM}}
+  end
+
+  @impl GenServer
+  def handle_call(:nodes, _from, state) do
+    {:reply, state.nodes, state}
   end
 
   @impl GenServer
@@ -90,13 +97,7 @@ defmodule Klf200.Client do
       case response do
         {:ok, resp_data} ->
           if state.waiting_client, do: GenServer.reply(state.waiting_client, resp_data)
-
-          if state.waiting_for_frame == :GW_PASSWORD_ENTER_CFM &&
-               resp_data.frame == :GW_PASSWORD_ENTER_CFM do
-            %{state | waiting_for_frame: nil, logged_in: resp_data.payload}
-          else
-            state
-          end
+          update_state(state, resp_data)
 
         {:error, reason} ->
           if state.waiting_client, do: GenServer.reply(state.waiting_client, {:error, reason})
@@ -120,4 +121,17 @@ defmodule Klf200.Client do
       _ -> session + 1
     end
   end
+
+  defp update_state(%{waiting_for_frame: :GW_PASSWORD_ENTER_CFM} = state, %{
+         frame: :GW_PASSWORD_ENTER_CFM,
+         payload: payload
+       }) do
+    %{state | waiting_for_frame: nil, logged_in: payload}
+  end
+
+  defp update_state(state, %{frame: :GW_GET_ALL_NODES_INFORMATION_NTF, payload: node}) do
+    %{state | nodes: Map.put(state.nodes, node.node, node)}
+  end
+
+  defp update_state(state, %{frame: _frame, payload: _payload}), do: state
 end

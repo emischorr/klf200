@@ -38,6 +38,8 @@ defmodule Klf200.Api do
     message <> checksum(message)
   end
 
+  defp parse_message({:error, error}), do: {:error, error}
+
   defp parse_message(message) do
     payload_size = byte_size(message) - 2
     <<protocol::binary-size(1), payload::binary-size(payload_size), cs::binary-size(1)>> = message
