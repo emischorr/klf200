@@ -11,7 +11,7 @@ defmodule Klf200.Client do
   alias Klf200.Api
   alias Klf200.Client.SSL_Helper
 
-  @klf_cert "klf-cert.pem"
+  @klf_cert "#{:code.priv_dir(:klf200)}/priv/klf-cert.pem"
   @klf_ssl_fingerprint "028C23A0892B6298C499005BD2E72E0A703D716A"
   @socket_opts [
     packet: :raw,
