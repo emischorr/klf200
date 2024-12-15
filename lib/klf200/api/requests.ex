@@ -1,4 +1,6 @@
 defmodule Klf200.Api.Requests do
+  require Logger
+
   @commands %{
     # GW_REBOOT_REQ: "0001",
     GW_GET_VERSION_REQ: "0008",
@@ -104,7 +106,7 @@ defmodule Klf200.Api.Requests do
   end
 
   defp build_data(cmd, data) when is_atom(cmd) do
-    IO.puts("unsupported cmd #{inspect(cmd)} with data: #{inspect(data)}")
+    Logger.warning("[klf200] unsupported cmd #{inspect(cmd)} with data: #{inspect(data)}")
     {:error, :not_implemented}
   end
 

@@ -15,6 +15,7 @@ defmodule Klf200 do
   end
 
   def nodes() do
+    Klf200.Client.command(:GW_GET_ALL_NODES_INFORMATION_REQ)
     Klf200.Client.nodes()
   end
 

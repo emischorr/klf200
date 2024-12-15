@@ -1,4 +1,6 @@
 defmodule Klf200.Api.Confirmations do
+  require Logger
+
   @cfm %{
     # "0000" => :GW_ERROR_NTF,
     # "0002" => :GW_REBOOT_CFM,
@@ -214,7 +216,7 @@ defmodule Klf200.Api.Confirmations do
   end
 
   defp do_parse(cfm, data) do
-    IO.puts("unsupported cfm #{inspect(cfm)} with data: #{inspect(data)}")
+    Logger.warning("[klf200] unsupported cfm #{inspect(cfm)} with data: #{inspect(data)}")
     {:error, :not_implemented}
   end
 

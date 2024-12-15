@@ -4,7 +4,7 @@ defmodule Klf200.MixProject do
   def project do
     [
       app: :klf200,
-      version: "0.1.3",
+      version: "0.1.4",
       name: "klf200",
       description: "A client for the VELUX klf200 API",
       source_url: "https://github.com/emischorr/klf200",

@@ -8,6 +8,9 @@ defmodule Klf200.Client do
   """
 
   use GenServer
+
+  require Logger
+
   alias Klf200.Api
   alias Klf200.Client.SSL_Helper
 
@@ -53,7 +56,7 @@ defmodule Klf200.Client do
   def handle_call({:connect, host}, _from, state) do
     case Socket.SSL.connect({host, @klf_port}, @socket_opts) do
       {:ok, socket} ->
-        IO.puts("Connection established. Listening...")
+        Logger.debug("[klf200] Connection established. Listening...")
         {:ok, _pid} = Task.start_link(fn -> listen(socket) end)
         {:reply, :ok, %{state | socket: socket}}
 
@@ -91,7 +94,8 @@ defmodule Klf200.Client do
 
   @impl GenServer
   def handle_cast({:recv, data}, state) do
-    response = Api.response(data) |> IO.inspect(label: "recv data")
+    response = Api.response(data)
+    Logger.debug("[klf200] Received data: #{inspect(response)}")
 
     new_state =
       case response do
