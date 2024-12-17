@@ -14,13 +14,7 @@ defmodule Klf200.Client do
   alias Klf200.Api
   alias Klf200.Client.SSL_Helper
 
-  @klf_cert "#{:code.priv_dir(:klf200)}/klf-cert.pem"
   @klf_ssl_fingerprint "028C23A0892B6298C499005BD2E72E0A703D716A"
-  @socket_opts [
-    packet: :raw,
-    authorities: [path: @klf_cert],
-    verify: [function: &SSL_Helper.verify_fun/3, data: {:sha, @klf_ssl_fingerprint}]
-  ]
   @klf_port 51200
 
   # API
@@ -54,7 +48,7 @@ defmodule Klf200.Client do
 
   @impl GenServer
   def handle_call({:connect, host}, _from, state) do
-    case Socket.SSL.connect({host, @klf_port}, @socket_opts) do
+    case Socket.SSL.connect({host, @klf_port}, socket_opts()) do
       {:ok, socket} ->
         Logger.debug("[klf200] Connection established. Listening...")
         {:ok, _pid} = Task.start_link(fn -> listen(socket) end)
@@ -138,4 +132,14 @@ defmodule Klf200.Client do
   end
 
   defp update_state(state, %{frame: _frame, payload: _payload}), do: state
+
+  defp socket_opts do
+    klf_cert = "#{:code.priv_dir(:klf200)}/klf-cert.pem"
+
+    [
+      packet: :raw,
+      authorities: [path: klf_cert],
+      verify: [function: &SSL_Helper.verify_fun/3, data: {:sha, @klf_ssl_fingerprint}]
+    ]
+  end
 end
