@@ -17,6 +17,8 @@ defmodule Klf200.Client do
   @klf_ssl_fingerprint "028C23A0892B6298C499005BD2E72E0A703D716A"
   @klf_port 51200
 
+  @empty_state %{socket: nil, logged_in: nil, waiting_client: nil, waiting_for_frame: nil, next_session: 0, nodes: %{}}
+
   # API
   def start_link(opts \\ []) do
     # TODO: switch to dynamic naming
@@ -39,11 +41,13 @@ defmodule Klf200.Client do
     GenServer.call(__MODULE__, {:command, cmd, data})
   end
 
+  def disconnect, do: GenServer.call(__MODULE__, :disconnect)
+
   # Callbacks
 
   @impl GenServer
   def init(_opts) do
-    {:ok, %{socket: nil, logged_in: nil, waiting_client: nil, waiting_for_frame: nil, next_session: 0, nodes: %{}}}
+    {:ok, @empty_state}
   end
 
   @impl GenServer
@@ -83,6 +87,14 @@ defmodule Klf200.Client do
       {:noreply, %{state | next_session: update_session(session), waiting_client: from}}
     else
       {:reply, {:error, :not_logged_in}, state}
+    end
+  end
+
+  @impl GenServer
+  def handle_call(:disconnect, _from, %{socket: socket} = state) do
+    case Socket.Protocol.close(socket) do
+      :ok -> {:reply, :ok, @empty_state}
+      {:error, reason} -> {:reply, {:error, reason}, state}
     end
   end
 

@@ -8,7 +8,12 @@ defmodule Klf200 do
 
   """
   def connect(ip, pw) do
-    {:ok, _pid} = Klf200.Client.start_link()
+    # not matching on other return errors on purpose and let it crash instead
+    case Klf200.Client.start_link() do
+      {:ok, pid} -> pid
+      {:error, {:already_started, pid}} -> pid
+    end
+
     :ok = Klf200.Client.connect(ip)
     :ok = Klf200.Client.login(pw)
     Klf200.Client.command(:GW_GET_ALL_NODES_INFORMATION_REQ)
@@ -23,5 +28,9 @@ defmodule Klf200 do
 
   def position(node, pos) when is_integer(node) and is_integer(pos) do
     Klf200.Client.command(:GW_COMMAND_SEND_REQ, %{node: node, position: pos})
+  end
+
+  def disconnect do
+    Klf200.Client.disconnect()
   end
 end
