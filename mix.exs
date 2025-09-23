@@ -4,12 +4,12 @@ defmodule Klf200.MixProject do
   def project do
     [
       app: :klf200,
-      version: "0.1.5",
+      version: "0.2.0",
       name: "klf200",
       description: "A client for the VELUX klf200 API",
       source_url: "https://github.com/emischorr/klf200",
       homepage_url: "https://github.com/emischorr/klf200",
-      elixir: "~> 1.13",
+      elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
@@ -33,7 +33,7 @@ defmodule Klf200.MixProject do
   defp deps do
     [
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:socket, "~> 0.3"}
+      {:socket2, "~> 2.1"}
     ]
   end
 
