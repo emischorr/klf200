@@ -17,6 +17,8 @@ defmodule Klf200.Client do
   @klf_ssl_fingerprint "028C23A0892B6298C499005BD2E72E0A703D716A"
   @klf_port 51200
 
+  @default_timeout 7000
+
   @empty_state %{socket: nil, logged_in: nil, waiting_client: nil, waiting_for_frame: nil, next_session: 0, nodes: %{}}
 
   # API
@@ -35,10 +37,12 @@ defmodule Klf200.Client do
 
   def nodes, do: GenServer.call(__MODULE__, :nodes)
 
-  def command(cmd), do: command(cmd, %{})
+  def command(cmd), do: command(cmd, %{}, @default_timeout)
 
-  def command(cmd, data) do
-    GenServer.call(__MODULE__, {:command, cmd, data})
+  def command(cmd, data), do: command(cmd, data, @default_timeout)
+
+  def command(cmd, data, timeout) do
+    GenServer.call(__MODULE__, {:command, cmd, data}, timeout)
   end
 
   def disconnect, do: GenServer.call(__MODULE__, :disconnect)
