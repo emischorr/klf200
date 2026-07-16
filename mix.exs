@@ -4,7 +4,7 @@ defmodule Klf200.MixProject do
   def project do
     [
       app: :klf200,
-      version: "0.2.1",
+      version: "0.3.0",
       name: "klf200",
       description: "A client for the VELUX klf200 API",
       source_url: "https://github.com/emischorr/klf200",
@@ -40,7 +40,7 @@ defmodule Klf200.MixProject do
   defp package() do
     [
       name: "klf200",
-      files: ~w(lib priv .formatter.exs mix.exs README* LICENSE*),
+      files: ~w(lib .formatter.exs mix.exs README* LICENSE*),
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/emischorr/klf200"}
     ]
