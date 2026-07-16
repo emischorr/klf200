@@ -12,9 +12,7 @@ defmodule Klf200.Client do
   require Logger
 
   alias Klf200.Api
-  alias Klf200.Client.SSL_Helper
 
-  @klf_ssl_fingerprint "028C23A0892B6298C499005BD2E72E0A703D716A"
   @klf_port 51200
 
   @default_timeout 7000
@@ -150,12 +148,9 @@ defmodule Klf200.Client do
   defp update_state(state, %{frame: _frame, payload: _payload}), do: state
 
   defp socket_opts do
-    klf_cert = "#{:code.priv_dir(:klf200)}/klf-cert.pem"
-
     [
       packet: :raw,
-      authorities: [path: klf_cert],
-      verify: [function: &SSL_Helper.verify_fun/3, data: {:sha, @klf_ssl_fingerprint}]
+      verify: false
     ]
   end
 end

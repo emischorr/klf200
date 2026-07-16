@@ -1,6 +1,6 @@
 # Klf200
 
-**TODO: Add description**
+An Elixir library to connect and send commands to VELUX KLF200 device.
 
 ## Examples
 
